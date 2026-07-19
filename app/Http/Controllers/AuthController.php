@@ -24,6 +24,9 @@ class AuthController extends Controller
             return response()->json(['error' => 'Email veya şifre hatalı'], 401);
         }
 
+        // Update last login
+        $user->update(['last_login_at' => now()]);
+
         // Eski tokenları sil
         $user->tokens()->delete();
         $token = $user->createToken('admin-token')->plainTextToken;

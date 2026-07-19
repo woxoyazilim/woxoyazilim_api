@@ -14,7 +14,21 @@ class User extends Authenticatable
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['id', 'name', 'email', 'password', 'role'];
+    protected $fillable = ['id', 'name', 'email', 'password', 'role', 'is_active', 'last_login_at'];
     protected $hidden = ['password', 'remember_token'];
-    protected $casts = ['password' => 'hashed'];
+    protected $casts = [
+        'password' => 'hashed',
+        'is_active' => 'boolean',
+        'last_login_at' => 'datetime',
+    ];
+
+    public function assignedMessages()
+    {
+        return $this->hasMany(Message::class, 'assigned_to');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(AdminNotification::class);
+    }
 }

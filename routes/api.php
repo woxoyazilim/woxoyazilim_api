@@ -16,6 +16,9 @@ use App\Http\Controllers\ChatLeadController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\StatsController;
+use App\Http\Controllers\MessageNoteController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\UserController;
 
 // ==========================================
 // AUTH
@@ -83,8 +86,17 @@ Route::get('/messages', [MessageController::class, 'index'])->middleware('auth:s
 Route::get('/messages/{id}', [MessageController::class, 'show'])->middleware('auth:sanctum');
 Route::patch('/messages/{id}', [MessageController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/messages/{id}', [MessageController::class, 'destroy'])->middleware('auth:sanctum');
+Route::post('/messages/bulk', [MessageController::class, 'bulkAction'])->middleware('auth:sanctum');
+Route::post('/messages/{id}/erp-sync', [MessageController::class, 'syncToErp'])->middleware('auth:sanctum');
 Route::post('/contact-form', [MessageController::class, 'store']);
 Route::post('/contact', [MessageController::class, 'store']);
+
+// Message Notes
+Route::get('/messages/{messageId}/notes', [MessageNoteController::class, 'index'])->middleware('auth:sanctum');
+Route::post('/messages/{messageId}/notes', [MessageNoteController::class, 'store'])->middleware('auth:sanctum');
+Route::patch('/messages/{messageId}/notes/{noteId}', [MessageNoteController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('/messages/{messageId}/notes/{noteId}', [MessageNoteController::class, 'destroy'])->middleware('auth:sanctum');
+Route::patch('/messages/{messageId}/notes/{noteId}/pin', [MessageNoteController::class, 'togglePin'])->middleware('auth:sanctum');
 
 // ==========================================
 // DEMO REQUESTS
@@ -120,9 +132,27 @@ Route::put('/landing-pages/{id}', [LandingPageController::class, 'update'])->mid
 Route::delete('/landing-pages/{id}', [LandingPageController::class, 'destroy'])->middleware('auth:sanctum');
 
 // ==========================================
+// NOTIFICATIONS
+// ==========================================
+Route::get('/notifications', [NotificationController::class, 'index'])->middleware('auth:sanctum');
+Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->middleware('auth:sanctum');
+Route::patch('/notifications/{id}/read', [NotificationController::class, 'markRead'])->middleware('auth:sanctum');
+Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->middleware('auth:sanctum');
+
+// ==========================================
+// USERS / PERSONNEL
+// ==========================================
+Route::get('/users', [UserController::class, 'index'])->middleware('auth:sanctum', 'role:super_admin,admin');
+Route::get('/users/assignable', [UserController::class, 'assignableUsers'])->middleware('auth:sanctum');
+Route::get('/users/{id}', [UserController::class, 'show'])->middleware('auth:sanctum', 'role:super_admin,admin');
+Route::patch('/users/{id}', [UserController::class, 'update'])->middleware('auth:sanctum', 'role:super_admin');
+
+// ==========================================
 // STATS
 // ==========================================
 Route::get('/stats', [StatsController::class, 'index'])->middleware('auth:sanctum');
+Route::get('/stats/trends', [StatsController::class, 'trends'])->middleware('auth:sanctum');
+Route::get('/stats/personnel', [StatsController::class, 'personnel'])->middleware('auth:sanctum');
 
 // ==========================================
 // HEALTH CHECK
