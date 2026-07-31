@@ -2,10 +2,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\DemoRequest;
+use App\Services\LeadMailService;
 use Illuminate\Http\Request;
 
 class DemoRequestController extends Controller
 {
+    public function __construct(
+        protected LeadMailService $leadMailService,
+    ) {}
+
     public function index()
     {
         return response()->json([
@@ -28,6 +33,9 @@ class DemoRequestController extends Controller
             'message' => $request->message,
             'status' => 'pending',
         ]);
+
+        // E-posta bildirimi (hata olsa bile talep kaydı korunur)
+        $this->leadMailService->sendDemoRequest($dr);
 
         return response()->json(['success' => true, 'demoRequest' => $dr]);
     }

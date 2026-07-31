@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\User;
 use App\Services\GeoIpService;
+use App\Services\LeadMailService;
 use App\Services\MessageService;
 use App\Services\ErpSyncService;
 use App\Services\NotificationService;
@@ -15,6 +16,7 @@ class MessageController extends Controller
     public function __construct(
         protected MessageService $messageService,
         protected NotificationService $notificationService,
+        protected LeadMailService $leadMailService,
     ) {}
 
     /**
@@ -169,6 +171,9 @@ class MessageController extends Controller
 
         // Notify admins
         $this->notificationService->notifyNewMessage($msg);
+
+        // E-posta bildirimi (hata olsa bile talep kaydı korunur)
+        $this->leadMailService->sendContactMessage($msg);
 
         return response()->json(['success' => true, 'message' => $msg]);
     }

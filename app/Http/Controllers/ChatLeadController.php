@@ -2,17 +2,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChatLead;
+use App\Services\LeadMailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class ChatLeadController extends Controller
 {
+    public function __construct(
+        protected LeadMailService $leadMailService,
+    ) {}
+
     public function index() { return response()->json(['chatLeads' => ChatLead::orderByDesc('created_at')->get()]); }
 
     public function store(Request $request)
     {
         $lead = ChatLead::create(['id' => $request->id ?: 'lead-' . time(), 'name' => $request->name, 'email' => $request->email, 'phone' => $request->phone, 'messages' => $request->messages, 'source' => $request->source ?: 'chatbot']);
+
+        // E-posta bildirimi (hata olsa bile kayıt korunur)
+        $this->leadMailService->sendChatLead($lead);
         return response()->json(['success' => true, 'chatLead' => $lead]);
     }
 
