@@ -19,6 +19,7 @@ use App\Http\Controllers\StatsController;
 use App\Http\Controllers\MessageNoteController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SiteSettingsController;
 
 // ==========================================
 // AUTH
@@ -153,6 +154,12 @@ Route::patch('/users/{id}', [UserController::class, 'update'])->middleware('auth
 Route::get('/stats', [StatsController::class, 'index'])->middleware('auth:sanctum');
 Route::get('/stats/trends', [StatsController::class, 'trends'])->middleware('auth:sanctum');
 Route::get('/stats/personnel', [StatsController::class, 'personnel'])->middleware('auth:sanctum');
+
+// ==========================================
+// SITE SETTINGS
+// ==========================================
+Route::get('/settings', [SiteSettingsController::class, 'index']);
+Route::put('/settings', [SiteSettingsController::class, 'update'])->middleware('auth:sanctum');
 
 // ==========================================
 // HEALTH CHECK
